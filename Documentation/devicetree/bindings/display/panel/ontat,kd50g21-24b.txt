@@ -1,0 +1,7 @@
+On Tat Industrial Company 5" DPI TFT panel (24 Bit Color).
+
+Required properties:
+- compatible: should be "ontat,kd50g21-24b"
+
+This binding is compatible with the simple-panel binding, which is specified
+in simple-panel.txt in this directory.

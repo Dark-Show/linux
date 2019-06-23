@@ -152,6 +152,8 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	udrc.dtbo \
 	upstream.dtbo \
 	vc4-fkms-v3d.dtbo \
+	vc4-kms-kd50g21-18b.dtbo \
+	vc4-kms-kd50g21-24b.dtbo \
 	vc4-kms-kippah-7inch.dtbo \
 	vc4-kms-v3d.dtbo \
 	vga666.dtbo \

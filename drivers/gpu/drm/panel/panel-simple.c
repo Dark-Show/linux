@@ -1813,11 +1813,48 @@ static const struct panel_desc olimex_lcd_olinuxino_43ts = {
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 };
 
+static const struct drm_display_mode ontat_kd50g21_mode = {
+	.clock = 32000,
+	.hdisplay = 800,
+	.hsync_start = 800 + 40,
+	.hsync_end = 800 + 40 + 48,
+	.htotal = 800 + 40 + 48 + 88,
+	.vdisplay = 480,
+	.vsync_start = 480 + 13,
+	.vsync_end = 480 + 13 + 3,
+	.vtotal = 480 + 13 + 3 + 32,
+	.vrefresh = 60,
+	.flags = DRM_MODE_FLAG_PVSYNC | DRM_MODE_FLAG_PHSYNC,
+};
+
+static const struct panel_desc ontat_kd50g21_18b = {
+	.modes = &ontat_kd50g21_mode,
+	.num_modes = 1,
+	.bpc = 8,
+	.size = {
+		.width = 108,
+		.height = 65,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
+};
+
+static const struct panel_desc ontat_kd50g21_24b = {
+	.modes = &ontat_kd50g21_mode,
+	.num_modes = 1,
+	.bpc = 8,
+	.size = {
+		.width = 108,
+		.height = 65,
+	},
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
 /*
  * 800x480 CVT. The panel appears to be quite accepting, at least as far as
  * pixel clocks, but this is the timing that was being used in the Adafruit
  * installation instructions.
  */
+
 static const struct drm_display_mode ontat_yx700wv03_mode = {
 	.clock = 29500,
 	.hdisplay = 800,
@@ -2498,6 +2535,12 @@ static const struct of_device_id platform_of_match[] = {
 	}, {
 		.compatible = "olimex,lcd-olinuxino-43-ts",
 		.data = &olimex_lcd_olinuxino_43ts,
+	}, {
+		.compatible = "ontat,kd50g21-18b",
+		.data = &ontat_kd50g21_18b,
+	}, {
+		.compatible = "ontat,kd50g21-24b",
+		.data = &ontat_kd50g21_24b,
 	}, {
 		.compatible = "ontat,yx700wv03",
 		.data = &ontat_yx700wv03,
