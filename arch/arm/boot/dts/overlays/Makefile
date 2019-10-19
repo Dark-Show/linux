@@ -1,6 +1,7 @@
 # Overlays for the Raspberry Pi platform
 
 dtbo-$(CONFIG_ARCH_BCM2835) += \
+	act-led.dtbo \
 	adau1977-adc.dtbo \
 	adau7002-simple.dtbo \
 	ads1015.dtbo \
@@ -26,6 +27,8 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	dht11.dtbo \
 	dionaudio-loco.dtbo \
 	dionaudio-loco-v2.dtbo \
+	disable-bt.dtbo \
+	disable-wifi.dtbo \
 	dpi18.dtbo \
 	dpi24.dtbo \
 	draws.dtbo \
@@ -50,6 +53,8 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	hifiberry-dac.dtbo \
 	hifiberry-dacplus.dtbo \
 	hifiberry-dacplusadc.dtbo \
+	hifiberry-dacplusadcpro.dtbo \
+	hifiberry-dacplusdsp.dtbo \
 	hifiberry-digi.dtbo \
 	hifiberry-digi-pro.dtbo \
 	hy28a.dtbo \
@@ -63,14 +68,22 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	i2c-rtc.dtbo \
 	i2c-rtc-gpio.dtbo \
 	i2c-sensor.dtbo \
+	i2c0.dtbo \
 	i2c0-bcm2708.dtbo \
+	i2c1.dtbo \
 	i2c1-bcm2708.dtbo \
+	i2c3.dtbo \
+	i2c4.dtbo \
+	i2c5.dtbo \
+	i2c6.dtbo \
 	i2s-gpio28-31.dtbo \
 	ilitek251x.dtbo \
+	imx219.dtbo \
 	iqaudio-codec.dtbo \
 	iqaudio-dac.dtbo \
 	iqaudio-dacplus.dtbo \
 	iqaudio-digi-wm8804-audio.dtbo \
+	irs1125.dtbo \
 	jedec-spi-nor.dtbo \
 	justboom-dac.dtbo \
 	justboom-digi.dtbo \
@@ -87,6 +100,7 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	media-center.dtbo \
 	midi-uart0.dtbo \
 	midi-uart1.dtbo \
+	miniuart-bt.dtbo \
 	mmc.dtbo \
 	mpu6050.dtbo \
 	mz61581.dtbo \
@@ -131,6 +145,7 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	smi-dev.dtbo \
 	smi-nand.dtbo \
 	spi-gpio35-39.dtbo \
+	spi-gpio40-45.dtbo \
 	spi-rtc.dtbo \
 	spi0-cs.dtbo \
 	spi0-hw-cs.dtbo \
@@ -140,6 +155,14 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	spi2-1cs.dtbo \
 	spi2-2cs.dtbo \
 	spi2-3cs.dtbo \
+	spi3-1cs.dtbo \
+	spi3-2cs.dtbo \
+	spi4-1cs.dtbo \
+	spi4-2cs.dtbo \
+	spi5-1cs.dtbo \
+	spi5-2cs.dtbo \
+	spi6-1cs.dtbo \
+	spi6-2cs.dtbo \
 	ssd1306.dtbo \
 	superaudioboard.dtbo \
 	sx150x.dtbo \
@@ -149,6 +172,10 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	tpm-slb9670.dtbo \
 	uart0.dtbo \
 	uart1.dtbo \
+	uart2.dtbo \
+	uart3.dtbo \
+	uart4.dtbo \
+	uart5.dtbo \
 	udrc.dtbo \
 	upstream.dtbo \
 	vc4-fkms-v3d.dtbo \
@@ -159,6 +186,7 @@ dtbo-$(CONFIG_ARCH_BCM2835) += \
 	vga666.dtbo \
 	w1-gpio.dtbo \
 	w1-gpio-pullup.dtbo \
+	w5500.dtbo \
 	wittypi.dtbo
 
 targets += dtbs dtbs_install

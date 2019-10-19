@@ -180,14 +180,16 @@ Params:
 
         act_led_activelow       Set to "on" to invert the sense of the LED
                                 (default "off")
-                                N.B. For Pi3 see pi3-act-led overlay.
+                                N.B. For Pi 3B, 3B+, 3A+ and 4B, use the act-led
+                                overlay.
 
         act_led_gpio            Set which GPIO to use for the activity LED
                                 (in case you want to connect it to an external
                                 device)
                                 (default "16" on a non-Plus board, "47" on a
                                 Plus or Pi 2)
-                                N.B. For Pi3 see pi3-act-led overlay.
+                                N.B. For Pi 3B, 3B+, 3A+ and 4B, use the act-led
+                                overlay.
 
         pwr_led_trigger
         pwr_led_activelow
@@ -203,6 +205,23 @@ Params:
         but deprecated because the ARM/VC assignments differ between board
         revisions. The same board-specific mapping applies to i2c_baudrate,
         and the other i2c baudrate parameters.
+
+
+Name:   act-led
+Info:   Pi 3B, 3B+, 3A+ and 4B use a GPIO expander to drive the LEDs which can
+        only be accessed from the VPU. There is a special driver for this with a
+        separate DT node, which has the unfortunate consequence of breaking the
+        act_led_gpio and act_led_activelow dtparams.
+        This overlay changes the GPIO controller back to the standard one and
+        restores the dtparams.
+Load:   dtoverlay=act-led,<param>=<val>
+Params: activelow               Set to "on" to invert the sense of the LED
+                                (default "off")
+
+        gpio                    Set which GPIO to use for the activity LED
+                                (in case you want to connect it to an external
+                                device)
+                                REQUIRED
 
 
 Name:   adau1977-adc
@@ -456,12 +475,14 @@ Params: <None>
 
 
 Name:   audremap
-Info:   Switches PWM sound output to pins 12 (Right) & 13 (Left)
+Info:   Switches PWM sound output to GPIOs on the 40-pin header
 Load:   dtoverlay=audremap,<param>=<val>
 Params: swap_lr                 Reverse the channel allocation, which will also
                                 swap the audio jack outputs (default off)
         enable_jack             Don't switch off the audio jack output
                                 (default off)
+        pins_12_13              Select GPIOs 12 & 13 (default)
+        pins_18_19              Select GPIOs 18 & 19
 
 
 Name:   balena-fin
@@ -507,6 +528,21 @@ Params: 24db_digital_gain       Allow gain to be applied via the PCM512x codec
                                 responsibility of the user to ensure that
                                 the Digital volume control is set to a value
                                 that does not result in clipping/distortion!)
+
+
+Name:   disable-bt
+Info:   Disable onboard Bluetooth on Pi 3B, 3B+, 3A+, 4B and Zero W, restoring
+        UART0/ttyAMA0 over GPIOs 14 & 15.
+        N.B. To disable the systemd service that initialises the modem so it
+        doesn't use the UART, use 'sudo systemctl disable hciuart'.
+Load:   dtoverlay=disable-bt
+Params: <None>
+
+
+Name:   disable-wifi
+Info:   Disable onboard WiFi on Pi 3B, 3B+, 3A+, 4B and Zero W.
+Load:   dtoverlay=disable-wifi
+Params: <None>
 
 
 Name:   dpi18
@@ -767,6 +803,9 @@ Params: gpio_pin                GPIO pin to trigger on (default 3)
                                 Note that the default pin (GPIO3) has an
                                 external pullup.
 
+        debounce                Specify the debounce interval in milliseconds
+                                (default 100)
+
 
 Name:   hd44780-lcd
 Info:   Configures an HD44780 compatible LCD display. Uses 4 gpio pins for
@@ -845,6 +884,33 @@ Params: 24db_digital_gain       Allow gain to be applied via the PCM512x codec
                                 that does not result in clipping/distortion!)
         slave                   Force DAC+ Pro into slave mode, using Pi as
                                 master for bit clock and frame clock.
+
+
+Name:   hifiberry-dacplusadcpro
+Info:   Configures the HifiBerry DAC+ADC PRO audio card
+Load:   dtoverlay=hifiberry-dacplusadcpro,<param>=<val>
+Params: 24db_digital_gain       Allow gain to be applied via the PCM512x codec
+                                Digital volume control. Enable with
+                                "dtoverlay=hifiberry-dacplusadcpro,24db_digital_gain"
+                                (The default behaviour is that the Digital
+                                volume control is limited to a maximum of
+                                0dB. ie. it can attenuate but not provide
+                                gain. For most users, this will be desired
+                                as it will prevent clipping. By appending
+                                the 24dB_digital_gain parameter, the Digital
+                                volume control will allow up to 24dB of
+                                gain. If this parameter is enabled, it is the
+                                responsibility of the user to ensure that
+                                the Digital volume control is set to a value
+                                that does not result in clipping/distortion!)
+        slave                   Force DAC+ADC Pro into slave mode, using Pi as
+                                master for bit clock and frame clock.
+
+
+Name:   hifiberry-dacplusdsp
+Info:   Configures the HifiBerry DAC+DSP audio card
+Load:   dtoverlay=hifiberry-dacplusdsp
+Params: <None>
 
 
 Name:   hifiberry-digi
@@ -988,6 +1054,8 @@ Params: abx80x                  Select one of the ABx80x family:
 
         pcf2127                 Select the PCF2127 device
 
+        pcf2129                 Select the PCF2129 device
+
         pcf8523                 Select the PCF8523 device
 
         pcf8563                 Select the PCF8563 device
@@ -1033,9 +1101,13 @@ Params: abx80x                  Select one of the ABx80x family:
 
         pcf2127                 Select the PCF2127 device
 
+        pcf2129                 Select the PCF2129 device
+
         pcf8523                 Select the PCF8523 device
 
         pcf8563                 Select the PCF8563 device
+
+        rv3028                  Select the Micro Crystal RV3028 device
 
         addr                    Sets the address for the RTC. Note that the
                                 device must be configured to use the specified
@@ -1045,10 +1117,13 @@ Params: abx80x                  Select one of the ABx80x family:
                                 "schottky" (ABx80x only)
 
         trickle-resistor-ohms   Resistor value for trickle charge (DS1339,
-                                ABx80x)
+                                ABx80x, RV3028)
 
         wakeup-source           Specify that the RTC can be used as a wakeup
                                 source
+
+        backup-switchover-mode  Backup power supply switch mode. Must be 0 for
+                                off or 1 for Vdd < VBackup (RV3028 only)
 
         i2c_gpio_sda            GPIO used for I2C data (default "23")
 
@@ -1108,14 +1183,12 @@ Params: addr                    Set the address for the BME280, BMP280, DS1621,
                                 sensor
 
 
-Name:   i2c0-bcm2708
+Name:   i2c0
 Info:   Change i2c0 pin usage. Not all pin combinations are usable on all
         platforms - platforms other then Compute Modules can only use this
         to disable transaction combining.
-Load:   dtoverlay=i2c0-bcm2708,<param>=<val>
-Params: sda0_pin                GPIO pin for SDA0 (deprecated - use pins_*)
-        scl0_pin                GPIO pin for SCL0 (deprecated - use pins_*)
-        pins_0_1                Use pins 0 and 1 (default)
+Load:   dtoverlay=i2c0,<param>=<val>
+Params: pins_0_1                Use pins 0 and 1 (default)
         pins_28_29              Use pins 28 and 29
         pins_44_45              Use pins 44 and 45
         pins_46_47              Use pins 46 and 47
@@ -1123,18 +1196,69 @@ Params: sda0_pin                GPIO pin for SDA0 (deprecated - use pins_*)
                                 "yes")
 
 
-Name:   i2c1-bcm2708
+Name:   i2c0-bcm2708
+Info:   Deprecated, legacy version of i2c0, from which it inherits its
+        parameters, just adding the explicit individual pin specifiers.
+Load:   <Deprecated>
+Params: sda0_pin                GPIO pin for SDA0 (deprecated - use pins_*)
+        scl0_pin                GPIO pin for SCL0 (deprecated - use pins_*)
+
+
+Name:   i2c1
 Info:   Change i2c1 pin usage. Not all pin combinations are usable on all
         platforms - platforms other then Compute Modules can only use this
         to disable transaction combining.
-Info:   Enable the i2c_bcm2708 driver for the i2c1 bus
-Load:   dtoverlay=i2c1-bcm2708,<param>=<val>
+Load:   dtoverlay=i2c1,<param>=<val>
+Params: pins_2_3                Use pins 2 and 3 (default)
+        pins_44_45              Use pins 44 and 45
+        combine                 Allow transactions to be combined (default
+                                "yes")
+
+
+Name:   i2c1-bcm2708
+Info:   Deprecated, legacy version of i2c1, from which it inherits its
+        parameters, just adding the explicit individual pin specifiers.
+Load:   <Deprecated>
 Params: sda1_pin                GPIO pin for SDA1 (2 or 44 - default 2)
         scl1_pin                GPIO pin for SCL1 (3 or 45 - default 3)
         pin_func                Alternative pin function (4 (alt0), 6 (alt2) -
                                 default 4)
-        combine                 Allow transactions to be combined (default
-                                "yes")
+
+
+Name:   i2c3
+Info:   Enable the i2c3 bus
+Load:   dtoverlay=i2c3,<param>
+Params: pins_2_3                Use GPIOs 2 and 3
+        pins_4_5                Use GPIOs 4 and 5 (default)
+        baudrate                Set the baudrate for the interface (default
+                                "100000")
+
+
+Name:   i2c4
+Info:   Enable the i2c4 bus
+Load:   dtoverlay=i2c4,<param>
+Params: pins_6_7                Use GPIOs 6 and 7
+        pins_8_9                Use GPIOs 8 and 9 (default)
+        baudrate                Set the baudrate for the interface (default
+                                "100000")
+
+
+Name:   i2c5
+Info:   Enable the i2c5 bus
+Load:   dtoverlay=i2c5,<param>
+Params: pins_10_11              Use GPIOs 10 and 11
+        pins_12_13              Use GPIOs 12 and 13 (default)
+        baudrate                Set the baudrate for the interface (default
+                                "100000")
+
+
+Name:   i2c6
+Info:   Enable the i2c6 bus
+Load:   dtoverlay=i2c6,<param>
+Params: pins_0_1                Use GPIOs 0 and 1
+        pins_22_23              Use GPIOs 22 and 23 (default)
+        baudrate                Set the baudrate for the interface (default
+                                "100000")
 
 
 Name:   i2s-gpio28-31
@@ -1152,6 +1276,18 @@ Params: interrupt               GPIO used for interrupt (default 4)
                                 touchscreen (in pixels)
         sizey                   Touchscreen size y, vertical resolution of
                                 touchscreen (in pixels)
+
+
+Name:   imx219
+Info:   Sony IMX219 camera module.
+        Uses Unicam 1, which is the standard camera connector on most Pi
+        variants.
+Load:   dtoverlay=imx219,<param>=<val>
+Params: i2c_pins_0_1            Use pins 0&1 for the I2C instead of 44&45.
+                                Useful on Compute Modules.
+
+        i2c_pins_28_29          Use pins 28&29 for the I2C instead of 44&45.
+                                This is required for Pi B+, 2, 0, and 0W.
 
 
 Name:   iqaudio-codec
@@ -1209,6 +1345,18 @@ Params: card_name               Override the default, "IQAudIODigi", card name.
         dai_name                Override the default, "IQAudIO Digi", dai name.
         dai_stream_name         Override the default, "IQAudIO Digi HiFi",
                                 dai stream name.
+
+
+Name:   irs1125
+Info:   Infineon irs1125 TOF camera module.
+        Uses Unicam 1, which is the standard camera connector on most Pi
+        variants.
+Load:   dtoverlay=irs1125,<param>=<val>
+Params: i2c_pins_0_1            Use pins 0&1 for the I2C instead of 44&45.
+                                Useful on Compute Modules.
+
+        i2c_pins_28_29          Use pins 28&29 for the I2C instead of 44&45.
+                                This is required for Pi B+, 2, 0, and 0W.
 
 
 Name:   jedec-spi-nor
@@ -1300,6 +1448,7 @@ Params: gpiopin                 Gpio pin connected to the INTA output of the
         addr                    I2C address of the MCP23017 (default: 0x20)
 
         mcp23008                Configure an MCP23008 instead.
+        noints                  Disable the interrupt GPIO line.
 
 
 Name:   mcp23s17
@@ -1419,6 +1568,20 @@ Load:   dtoverlay=midi-uart1
 Params: <None>
 
 
+Name:   miniuart-bt
+Info:   Switch the onboard Bluetooth function on Pi 3B, 3B+, 3A+, 4B and Zero W
+        to use the mini-UART (ttyS0) and restore UART0/ttyAMA0 over GPIOs 14 &
+        15. Note that this may reduce the maximum usable baudrate.
+        N.B. It is also necessary to edit /lib/systemd/system/hciuart.service
+        and replace ttyAMA0 with ttyS0, unless using Raspbian or another
+        distribution with udev rules that create /dev/serial0 and /dev/serial1,
+        in which case use /dev/serial1 instead because it will always be
+        correct. Furthermore, you must also set core_freq and core_freq_min to
+        the same value in config.txt or the miniuart will not work.
+Load:   dtoverlay=miniuart-bt
+Params: <None>
+
+
 Name:   mmc
 Info:   Selects the bcm2835-mmc SD/MMC driver, optionally with overclock
 Load:   dtoverlay=mmc,<param>=<val>
@@ -1481,48 +1644,27 @@ Params: panel                   Display panel (required):
 
 
 Name:   pi3-act-led
-Info:   Pi3 uses a GPIO expander to drive the LEDs which can only be accessed
-        from the VPU. There is a special driver for this with a separate DT
-        node, which has the unfortunate consequence of breaking the
-        act_led_gpio and act_led_activelow dtparams.
-        This overlay changes the GPIO controller back to the standard one and
-        restores the dtparams.
-Load:   dtoverlay=pi3-act-led,<param>=<val>
-Params: activelow               Set to "on" to invert the sense of the LED
-                                (default "off")
-
-        gpio                    Set which GPIO to use for the activity LED
-                                (in case you want to connect it to an external
-                                device)
-                                REQUIRED
+Info:   This overlay has been renamed act-led, keeping pi3-act-led as an alias
+        for backwards compatibility.
+Load:   <Deprecated>
 
 
 Name:   pi3-disable-bt
-Info:   Disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15
-        N.B. To disable the systemd service that initialises the modem so it
-        doesn't use the UART, use 'sudo systemctl disable hciuart'.
-Load:   dtoverlay=pi3-disable-bt
-Params: <None>
+Info:   This overlay has been renamed disable-bt, keeping pi3-disable-bt as an
+        alias for backwards compatibility.
+Load:   <Deprecated>
 
 
 Name:   pi3-disable-wifi
-Info:   Disable Pi3 onboard WiFi
-Load:   dtoverlay=pi3-disable-wifi
-Params: <None>
+Info:   This overlay has been renamed disable-wifi, keeping pi3-disable-wifi as
+        an alias for backwards compatibility.
+Load:   <Deprecated>
 
 
 Name:   pi3-miniuart-bt
-Info:   Switch Pi3 Bluetooth function to use the mini-UART (ttyS0) and restore
-        UART0/ttyAMA0 over GPIOs 14 & 15. Note that this may reduce the maximum
-        usable baudrate.
-        N.B. It is also necessary to edit /lib/systemd/system/hciuart.service
-        and replace ttyAMA0 with ttyS0, unless you have a system with udev rules
-        that create /dev/serial0 and /dev/serial1, in which case use
-        /dev/serial1 instead because it will always be correct. Furthermore,
-        you must also set core_freq=250 in config.txt or the miniuart will not
-        work.
-Load:   dtoverlay=pi3-miniuart-bt
-Params: <None>
+Info:   This overlay has been renamed miniuart-bt, keeping pi3-miniuart-bt as
+        an alias for backwards compatibility.
+Load:   <Deprecated>
 
 
 Name:   pibell
@@ -1939,6 +2081,12 @@ Load:   dtoverlay=spi-gpio35-39
 Params: <None>
 
 
+Name:   spi-gpio40-45
+Info:   Move SPI function block to GPIOs 40 to 45
+Load:   dtoverlay=spi-gpio40-45
+Params: <None>
+
+
 Name:   spi-rtc
 Info:   Adds support for a number of SPI Real Time Clock devices
 Load:   dtoverlay=spi-rtc,<param>=<val>
@@ -2055,6 +2203,110 @@ Params: cs0_pin                 GPIO pin for CS0 (default 43 - BCM SPI2_CE0).
         cs2_spidev              Set to 'disabled' to stop the creation of a
                                 userspace device node /dev/spidev2.2 (default
                                 is 'okay' or enabled).
+
+
+Name:   spi3-1cs
+Info:   Enables spi3 with a single chip select (CS) line and associated spidev
+        dev node. The gpio pin number for the CS line and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi3-1cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 0 - BCM SPI3_CE0).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev3.0 (default
+                                is 'on' or enabled).
+
+
+Name:   spi3-2cs
+Info:   Enables spi3 with two chip select (CS) lines and associated spidev
+        dev nodes. The gpio pin numbers for the CS lines and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi3-2cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 0 - BCM SPI3_CE0).
+        cs1_pin                 GPIO pin for CS1 (default 24 - BCM SPI3_CE1).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev3.0 (default
+                                is 'on' or enabled).
+        cs1_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev3.1 (default
+                                is 'on' or enabled).
+
+
+Name:   spi4-1cs
+Info:   Enables spi4 with a single chip select (CS) line and associated spidev
+        dev node. The gpio pin number for the CS line and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi4-1cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 4 - BCM SPI4_CE0).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev4.0 (default
+                                is 'on' or enabled).
+
+
+Name:   spi4-2cs
+Info:   Enables spi4 with two chip select (CS) lines and associated spidev
+        dev nodes. The gpio pin numbers for the CS lines and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi4-2cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 4 - BCM SPI4_CE0).
+        cs1_pin                 GPIO pin for CS1 (default 25 - BCM SPI4_CE1).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev4.0 (default
+                                is 'on' or enabled).
+        cs1_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev4.1 (default
+                                is 'on' or enabled).
+
+
+Name:   spi5-1cs
+Info:   Enables spi5 with a single chip select (CS) line and associated spidev
+        dev node. The gpio pin numbers for the CS lines and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi5-1cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 12 - BCM SPI5_CE0).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev5.0 (default
+                                is 'on' or enabled).
+
+
+Name:   spi5-2cs
+Info:   Enables spi5 with two chip select (CS) lines and associated spidev
+        dev nodes. The gpio pin numbers for the CS lines and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi5-2cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 12 - BCM SPI5_CE0).
+        cs1_pin                 GPIO pin for CS1 (default 26 - BCM SPI5_CE1).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev5.0 (default
+                                is 'on' or enabled).
+        cs1_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev5.1 (default
+                                is 'on' or enabled).
+
+
+Name:   spi6-1cs
+Info:   Enables spi6 with a single chip select (CS) line and associated spidev
+        dev node. The gpio pin number for the CS line and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi6-1cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 18 - BCM SPI6_CE0).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev6.0 (default
+                                is 'on' or enabled).
+
+
+Name:   spi6-2cs
+Info:   Enables spi6 with two chip select (CS) lines and associated spidev
+        dev nodes. The gpio pin numbers for the CS lines and spidev device node
+        creation are configurable.
+Load:   dtoverlay=spi6-2cs,<param>=<val>
+Params: cs0_pin                 GPIO pin for CS0 (default 18 - BCM SPI6_CE0).
+        cs1_pin                 GPIO pin for CS1 (default 27 - BCM SPI6_CE1).
+        cs0_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev6.0 (default
+                                is 'on' or enabled).
+        cs1_spidev              Set to 'off' to prevent the creation of a
+                                userspace device node /dev/spidev6.1 (default
+                                is 'on' or enabled).
 
 
 Name:   ssd1306
@@ -2199,6 +2451,30 @@ Params: txd1_pin                GPIO pin for TXD1 (14, 32 or 40 - default 14)
         rxd1_pin                GPIO pin for RXD1 (15, 33 or 41 - default 15)
 
 
+Name:   uart2
+Info:   Enable uart 2 on GPIOs 0-3
+Load:   dtoverlay=uart2,<param>
+Params: ctsrts                  Enable CTS/RTS on GPIOs 2-3 (default off)
+
+
+Name:   uart3
+Info:   Enable uart 3 on GPIOs 4-7
+Load:   dtoverlay=uart3,<param>
+Params: ctsrts                  Enable CTS/RTS on GPIOs 6-7 (default off)
+
+
+Name:   uart4
+Info:   Enable uart 4 on GPIOs 8-11
+Load:   dtoverlay=uart4,<param>
+Params: ctsrts                  Enable CTS/RTS on GPIOs 10-11 (default off)
+
+
+Name:   uart5
+Info:   Enable uart 5 on GPIOs 12-15
+Load:   dtoverlay=uart5,<param>
+Params: ctsrts                  Enable CTS/RTS on GPIOs 14-15 (default off)
+
+
 Name:   udrc
 Info:   Configures the NW Digital Radio UDRC Hat
 Load:   dtoverlay=udrc,<param>=<val>
@@ -2246,6 +2522,7 @@ Params: cma-256                 CMA is 256MB (needs 1GB)
         cma-128                 CMA is 128MB
         cma-96                  CMA is 96MB
         cma-64                  CMA is 64MB
+        audio                   Enable or disable audio over HDMI (default "on")
 
 
 Name:   vga666
@@ -2271,6 +2548,16 @@ Load:   dtoverlay=w1-gpio-pullup,<param>=<val>
 Params: gpiopin                 GPIO for I/O (default "4")
         extpullup               GPIO for external pullup (default "5")
         pullup                  Now enabled by default (ignored)
+
+
+Name:   w5500
+Info:   Overlay for the Wiznet W5500 Ethernet Controller on SPI0
+Load:   dtoverlay=w5500,<param>=<val>
+Params: int_pin                 GPIO used for INT (default 25)
+
+        speed                   SPI bus speed (default 30000000)
+
+        cs                      SPI bus Chip Select (default 0)
 
 
 Name:   wittypi

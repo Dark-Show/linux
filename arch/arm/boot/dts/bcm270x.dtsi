@@ -10,11 +10,11 @@
 	soc: soc {
 
 		watchdog: watchdog@7e100000 {
-			/* Add alias */
+			/* Add label */
 		};
 
 		random: rng@7e104000 {
-			/* Add alias */
+			/* Add label */
 		};
 
 		gpio@7e200000 { /* gpio */
@@ -47,18 +47,18 @@
 		};
 
 		spi0: spi@7e204000 {
-			/* Add alias */
+			/* Add label */
 			dmas = <&dma 6>, <&dma 7>;
 			dma-names = "tx", "rx";
 		};
 
 		pixelvalve0: pixelvalve@7e206000 {
-			/* Add alias */
+			/* Add label */
 			status = "disabled";
 		};
 
 		pixelvalve1: pixelvalve@7e207000 {
-			/* Add alias */
+			/* Add label */
 			status = "disabled";
 		};
 
@@ -75,7 +75,7 @@
 
 		/delete-node/ sdhci@7e300000;
 
-		mmc: mmc@7e300000 {
+		sdhci: mmc: mmc@7e300000 {
 			compatible = "brcm,bcm2835-mmc", "brcm,bcm2835-sdhci";
 			reg = <0x7e300000 0x100>;
 			interrupts = <2 30>;
@@ -100,7 +100,7 @@
 		};
 
 		hvs: hvs@7e400000 {
-			/* Add alias */
+			/* Add label */
 			status = "disabled";
 		};
 
@@ -126,7 +126,7 @@
 		};
 
 		pixelvalve2: pixelvalve@7e807000 {
-			/* Add alias */
+			/* Add label */
 			status = "disabled";
 		};
 
@@ -157,22 +157,6 @@
 			firmware = <&firmware>;
 			status = "disabled";
 		};
-	};
-
-	vdd_5v0_reg: fixedregulator_5v0 {
-		compatible = "regulator-fixed";
-		regulator-name = "5v0";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-always-on;
-	};
-
-	vdd_3v3_reg: fixedregulator_3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "3v3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
 	};
 
 	__overrides__ {

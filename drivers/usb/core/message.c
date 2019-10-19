@@ -1113,6 +1113,21 @@ static void remove_intf_ep_devs(struct usb_interface *intf)
 	intf->ep_devs_created = 0;
 }
 
+void usb_fixup_endpoint(struct usb_device *dev, int epaddr, int interval)
+{
+	unsigned int epnum = epaddr & USB_ENDPOINT_NUMBER_MASK;
+	struct usb_host_endpoint *ep;
+
+	if (usb_endpoint_out(epaddr))
+		ep = dev->ep_out[epnum];
+	else
+		ep = dev->ep_in[epnum];
+
+	if (ep && usb_endpoint_xfer_int(&ep->desc))
+		usb_hcd_fixup_endpoint(dev, ep, interval);
+}
+EXPORT_SYMBOL_GPL(usb_fixup_endpoint);
+
 /**
  * usb_disable_endpoint -- Disable an endpoint by address
  * @dev: the device whose endpoint is being disabled
@@ -2290,14 +2305,14 @@ int cdc_parse_cdc_header(struct usb_cdc_parsed_header *hdr,
 				(struct usb_cdc_dmm_desc *)buffer;
 			break;
 		case USB_CDC_MDLM_TYPE:
-			if (elength < sizeof(struct usb_cdc_mdlm_desc *))
+			if (elength < sizeof(struct usb_cdc_mdlm_desc))
 				goto next_desc;
 			if (desc)
 				return -EINVAL;
 			desc = (struct usb_cdc_mdlm_desc *)buffer;
 			break;
 		case USB_CDC_MDLM_DETAIL_TYPE:
-			if (elength < sizeof(struct usb_cdc_mdlm_detail_desc *))
+			if (elength < sizeof(struct usb_cdc_mdlm_detail_desc))
 				goto next_desc;
 			if (detail)
 				return -EINVAL;
