@@ -327,7 +327,8 @@
 			#interrupt-cells = <1>;
 			#size-cells = <2>;
 			bus-range = <0x0 0x01>;
-			compatible = "brcm,bcm7211-pcie", "brcm,bcm7445-pcie",
+			compatible = "brcm,bcm2711b0-pcie", // Safe value
+				     "brcm,bcm2711-pcie",
 				     "brcm,pci-plat-dev";
 			max-link-speed = <2>;
 			tot-num-pcie = <1>;
@@ -380,6 +381,7 @@
 					/* No interrupts - use PHY_POLL */
 					max-speed = <1000>;
 					reg = <0x1>;
+					led-modes = <0x00 0x08>; /* link/activity link */
 				};
 			};
 		};
@@ -647,6 +649,7 @@
 
 &usb {
 	interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+	status = "disabled";
 };
 
 &hdmi {
